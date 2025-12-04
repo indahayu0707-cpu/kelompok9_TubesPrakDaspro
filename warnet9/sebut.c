@@ -7,13 +7,11 @@
 #define BLUE "\x1b[34m"
 #define MAGENTA "\x1b[35m"
 #define CYAN "\x1b[36m"
-#define WHITE "\x1b[37m"
 
 char ruangan[3][20] = {"Reguler", "VIP", "Premium"};
-int status[3] = {1, 1, 1}; 
+int status[3] = {1, 1, 1};
 int hargaPerJam[3] = {5000, 10000, 15000};
 int nomor = 1;
-
 char paket[4][30] = {"Paket Hemat (2 Jam)", "Paket Lama (4 Jam)", "Paket Nyaman (3 Jam)", "Tidak Ada Paket"};
 int durasiPaket[4] = {2, 4, 3, 0};
 int hargaPaket[4] = {9000, 18000, 14000, 0};
@@ -39,7 +37,16 @@ void menu()
         printf("2. Sewa Ruangan\n");
         printf("3. Keluar\n");
         printf(BLUE "Pilih: " RESET);
-        scanf("%d", &pilih);
+
+        while (scanf("%d", &pilih) != 1)
+        {
+            printf(RED "Input tidak valid! Masukkan angka 1-3.\n" RESET);
+
+            while (getchar() != '\n')
+                ;
+
+            printf(BLUE "Pilih: " RESET);
+        }
 
         switch (pilih)
         {
@@ -79,7 +86,13 @@ void sewaRuangan()
 
     tampilkanRuangan();
     printf(GREEN "Pilih ruangan (1-3): " RESET);
-    scanf("%d", &pilihRuangan);
+    while (scanf("%d", &pilihRuangan) != 1)
+    {
+        printf(RED "Input tidak valid! Masukkan angka.\n" RESET);
+        while (getchar() != '\n')
+            ;
+        printf(GREEN "Pilih ruangan (1-3): " RESET);
+    }
 
     if (pilihRuangan < 1 || pilihRuangan > 3)
     {
@@ -93,39 +106,49 @@ void sewaRuangan()
     }
 
     printf(YELLOW "\n========== PILIH PAKET ==========\n" RESET);
-    for (int i = 0; i < 4; i++) 
+    for (int i = 0; i < 4; i++)
     {
         printf("%d. %s - Rp %d\n", i + 1, paket[i], hargaPaket[i]);
     }
 
     while (1)
     {
-        printf(GREEN "Pilih paket (1-4): " RESET); 
-        scanf("%d", &pilihPaket);
-        if (pilihPaket >= 1 && pilihPaket <= 4)
+        printf(GREEN "Pilih paket (1-4): " RESET);
+        if (scanf("%d", &pilihPaket) == 1 && pilihPaket >= 1 && pilihPaket <= 4)
             break;
-        printf(RED "Pilihan paket tidak valid!\n" RESET);
+
+        printf(RED "Pilihan paket tidak valid! Masukkan angka 1-4.\n" RESET);
+        while (getchar() != '\n')
+            ;
     }
 
     if (pilihPaket != 3)
     {
         do
         {
-            printf(GREEN "Masukkan tambahan jam (=> 0): " RESET);
-            scanf("%d", &tambahanJam);
-            if (tambahanJam < 0)
-                printf(RED "Input tidak valid! Tambahan jam tidak boleh kurang dari 0.\n" RESET);
-        } while (tambahanJam < 0);
+            printf(GREEN "Masukkan tambahan jam (>= 0): " RESET);
+            if (scanf("%d", &tambahanJam) == 1 && tambahanJam >= 0)
+                break;
+
+            printf(RED "Input harus angka dan tidak boleh negatif!\n" RESET);
+            while (getchar() != '\n')
+                ;
+
+        } while (1);
     }
     else
     {
         do
         {
             printf(GREEN "Masukkan total jam sewa (> 0): " RESET);
-            scanf("%d", &tambahanJam);
-            if (tambahanJam <= 0)
-                printf(RED "Input tidak valid! Jam sewa harus lebih dari 0.\n" RESET);
-        } while (tambahanJam <= 0);
+            if (scanf("%d", &tambahanJam) == 1 && tambahanJam > 0)
+                break;
+
+            printf(RED "Input harus angka dan lebih dari 0!\n" RESET);
+            while (getchar() != '\n')
+                ;
+
+        } while (1);
     }
 
     int idx = pilihRuangan - 1;
@@ -141,7 +164,6 @@ void sewaRuangan()
         totalDurasi = durasiPaket[pilihPaket - 1] + tambahanJam;
         totalHarga = hargaPaket[pilihPaket - 1] + (tambahanJam * harga);
     }
-
 
     printf(YELLOW "\n============== STRUK PEMBAYARAN ==============\n" RESET);
     printf(CYAN "Nama Penyewa  :" RESET " %s\n", nama);
@@ -173,7 +195,7 @@ void simpanFile(char nama[], char ruangan[], char paket[], int durasiPaket, int 
     }
 
     fprintf(f, "%d. Nama: %s | Ruangan: %s | Paket: %s | Durasi Paket: %d | Tambahan Jam: %d | Total Bayar: %d\n",
-           nomor++, nama, ruangan, paket, durasiPaket, tambahanJam, totalHarga);
+            nomor++, nama, ruangan, paket, durasiPaket, tambahanJam, totalHarga);
 
     fclose(f);
 }
